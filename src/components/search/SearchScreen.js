@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import queryString from "query-string";
-import { heroes } from "../../data/heroes";
 import { HeroCard } from "../heroes/HeroCard";
 import { useForm } from "../hooks/useForm";
 import { useLocation } from "react-router-dom";
+import { getHeroesByName } from "../../selectors/getHeroesByName";
 
 export const SearchScreen = ({ history }) => {
   const location = useLocation();
@@ -14,7 +14,7 @@ export const SearchScreen = ({ history }) => {
   });
   const { searchText } = formValues;
 
-  const heroesFiltered = heroes;
+  const heroesFiltered = useMemo(() => getHeroesByName(q), [q]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -39,17 +39,27 @@ export const SearchScreen = ({ history }) => {
               value={searchText}
               onChange={handleInputChange}
             />
+            <button
+              type="submit"
+              className="btn m-1 btn-block btn-outline-primary"
+            >
+              Search
+            </button>
           </form>
-          <button
-            type="submit"
-            className="btn m-1 btn-block btn-outline-primary"
-          >
-            Search
-          </button>
         </div>
         <div className="col-7">
           <h4>Results</h4>
           <hr />
+          {q === "" && (
+            <div className="alert alert-info animate__animated animate__backInRight">
+              Search a Hero
+            </div>
+          )}
+          {q !== "" && heroesFiltered.length === 0 && (
+            <div className="alert alert-danger animate__animated   animate__headShake">
+              The hero {q} does not exist in this database
+            </div>
+          )}
           {heroesFiltered.map((hero) => (
             <HeroCard key={hero.id} {...hero} />
           ))}
