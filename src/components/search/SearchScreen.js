@@ -1,23 +1,28 @@
 import React from "react";
+import queryString from "query-string";
 import { heroes } from "../../data/heroes";
 import { HeroCard } from "../heroes/HeroCard";
 import { useForm } from "../hooks/useForm";
+import { useLocation } from "react-router-dom";
 
-export const SearchScreen = () => {
-  const heroesFiltered = heroes;
+export const SearchScreen = ({ history }) => {
+  const location = useLocation();
+  const { q = "" } = queryString.parse(location.search);
+
   const [formValues, handleInputChange] = useForm({
-    searchText: "",
+    searchText: q,
   });
-
   const { searchText } = formValues;
+
+  const heroesFiltered = heroes;
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log(searchText);
+    history.push(`?q=${searchText}`);
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-4 animate__animated animate__fadeIn">
       <h1>SearchScreen</h1>
       <hr />
       <div className="row">
